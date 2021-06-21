@@ -47,6 +47,11 @@ client.connect(err => {
           res.send(documents)
         })
       })
+      app.get('/admin', (req, res) => {
+        const userEmail = req.query.email;
+        adminCollection.find({ email: userEmail })
+            .toArray((err, result) => res.send(result))
+      })
 });
 
 app.get('/', (req, res) => {
