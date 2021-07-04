@@ -26,16 +26,27 @@ client.connect(err => {
     //   })
       app.patch('/updateProduct', (req, res) =>{
         const objectId = req.query.id
+        
+        const name = req.body.name
+        const sellername = req.body.sellername
+        const price = req.body.price
+        const stock = req.body.stock
+        const key = req.body.key
+        const category = req.body.category
+        const description = req.body.description
+        const features = JSON.parse(req.body.features)
+        console.log(features)
         productCollection.updateOne({_id: ObjectId(objectId)},
         {
-          $set: {img: req.body.img, 
-            name: req.body.name,
-            sellername: req.body.sellername,
-            stock: req.body.stock,
-            key: req.body.key,
-            category: req.body.category,
-            price: req.body.price,
-            description: req.body.description
+          $set: {
+            name: name,
+            sellername: sellername,
+            stock: stock,
+            key: key,
+            category: category,
+            price: price,
+            description: description,
+            features: features
         }
         })
         .then(result =>{
@@ -62,6 +73,7 @@ client.connect(err => {
         const key = req.body.key
         const category = req.body.category
         const description = req.body.description
+        const features = JSON.parse(req.body.features)
         
         const file = req.files.file
         const newImg = file.data;
@@ -73,7 +85,7 @@ client.connect(err => {
           img: Buffer.from(encImg, 'base64')
         };
 
-        productCollection.insertOne({ image, name, sellername, price, stock, key, category, description })
+        productCollection.insertOne({ image, name, sellername, price, stock, key, category, description, features })
           .then(result => res.send(result.insertedCount > 0))
       })
 
@@ -83,6 +95,19 @@ client.connect(err => {
           res.send(documents)
         })
       })
+      app.delete('/deleteSingleProduct/:id',(req, res) => {
+        const id=req.params.id
+        console.log(id);
+        productCollection.deleteOne({_id:ObjectId(id)})
+        .then(result => res.send(result.deletedCount>0))
+    })
+    app.get('/singleProductEdit/:id', (req, res) => {
+      const key = req.params.id
+      productCollection.find({_id: ObjectId(key)})
+      .toArray((err, documents) => {
+        res.send(documents)
+      })
+    })
 });
 
 app.get('/', (req, res) => {
